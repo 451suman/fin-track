@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Expense, Account, Transaction
+from .models import Category, Expense, Account, Transaction, Person, Loan, LoanRepayment
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -26,7 +26,6 @@ class ExpenseAdmin(admin.ModelAdmin):
 
 
 
-from .models import Category, Expense, Account, Transaction, Person, Loan, LoanRepayment
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):

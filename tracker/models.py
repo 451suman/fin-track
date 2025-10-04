@@ -5,7 +5,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models import Sum, F, Q
-
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     color = models.CharField(
@@ -124,10 +126,7 @@ class Expense(models.Model):
 
 
 # === Loans / Borrowings ===
-from django.db import models
-from django.contrib.auth.models import User
-from django.utils import timezone
-from django.db.models import Sum, Q
+
 
 
 class Person(models.Model):

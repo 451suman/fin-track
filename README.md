@@ -16,13 +16,6 @@ python manage.py runserver
 
 Visit http://127.0.0.1:8000 and register/login.
 
-## Import your Excel
-In the UI: **Import** (navbar) → upload `.xlsx` with columns **Category** and **Amount (NPR)**.
-
-Or via management command:
-```bash
-python manage.py import_excel <your_username> /path/to/Finance_Tracker.xlsx
-```
 
 ## Features
 - Bootstrap 5 dark-glass UI (cool cyan/violet theme)
