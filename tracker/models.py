@@ -1,10 +1,10 @@
+from datetime import date
 import datetime
 import nepali_datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models import Sum, F, Q
-
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -107,6 +107,20 @@ class Expense(models.Model):
 
     def __str__(self):
         return f"{self.category} - {self.amount}"
+    
+    @property
+    def nepali_date(self):
+        """Return transaction date (A.D → B.S)."""
+        if self.date:
+            return nepali_datetime.date.from_datetime_date(self.date)
+        return None
+
+    @property
+    def nepali_created_at(self):
+        """Return created_at datetime (A.D → B.S)."""
+        if self.created_at:
+            return nepali_datetime.datetime.from_datetime_datetime(self.created_at)
+        return None
 
 
 # === Loans / Borrowings ===
@@ -197,6 +211,26 @@ class Loan(models.Model):
             return nepali_datetime.date.from_datetime_date(self.due_date)
         return None
 
+    @property
+    def nepali_date(self):
+        """Return transaction date (A.D → B.S)."""
+        if self.date:
+            return nepali_datetime.date.from_datetime_date(self.date)
+        return None
+    
+    @property
+    def due_status(self):
+        """Return status based on comparison of due_date and today's date."""
+        today = date.today()
+        if not self.due_date:
+            return "-"
+        if self.due_date < today:
+            return "Overdue"
+        elif self.due_date == today:
+            return "Due Today"
+        else:
+            return "Upcoming"
+    
 
 class LoanRepayment(models.Model):
     """Each repayment for a loan."""

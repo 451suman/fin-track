@@ -30,6 +30,7 @@
     <table class="table table-hover align-middle mb-0">
       <thead><tr>
         <th>Date</th>
+        <th>Nepali Date</th>
         <th>Person</th>
         <th>Direction</th>
         <th>Principal</th>
@@ -38,12 +39,14 @@
         <th>Status</th>
         <th>Due</th>
         <th>Nepali Date Due</th>
+        <th>Due Status</th>
         <th class="text-end">Actions</th>
       </tr></thead>
       <tbody>
         {% for l in object_list %}
           <tr>
             <td>{{ l.date }}</td>
+            <td>{{ l.nepali_date }}</td>
             <td>{{ l.person.name }}</td>
             <td>{{ l.get_direction_display }}</td>
             <td>Rs. {{ l.principal|floatformat:2 }}</td>
@@ -52,9 +55,7 @@
             <td class="fw-semibold text-uppercase {% if l.status == 'CLOSED' %}text-success{% elif l.status == 'OPEN' %}text-danger{% endif %}">{{ l.status }}</td>
             <td>{% if l.due_date %}{{ l.due_date }}{% else %}<span class="text-secondary">—</span>{% endif %}</td>
             <td>{% if l.nepali_due_date %}{{ l.nepali_due_date }}{% else %}<span class="text-secondary">—</span>{% endif %}</td>
-          
-          
-          
+            <td class="fw-semibold text-uppercase {% if l.due_status == 'Overdue' %}text-danger{% elif l.due_status == 'Due Today' %}text-warning{% elif l.due_status == 'Upcoming' %}text-success{% endif %}" >{{ l.due_status }}</td>
             <td class="text-end">
               <a class="btn btn-sm btn-outline-light" href="{% url 'loan_detail' l.pk %}">Open</a>
               <a class="btn btn-sm btn-outline-light" href="{% url 'loan_update' l.pk %}">Edit</a>
