@@ -8,7 +8,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'opening_balance', 'user')
+    list_display = ('name', 'type', 'balance', 'user')
     list_filter = ('type',)
     search_fields = ('name',)
 

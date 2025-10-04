@@ -51,7 +51,7 @@ class Account(models.Model):
         expense = totals.get("expense") or 0
         return self.opening_balance + income - expense
 
-
+# keep transaction with loan and repayment
 class Transaction(models.Model):
     KIND_INCOME = "INCOME"
     KIND_EXPENSE = "EXPENSE"
@@ -87,6 +87,7 @@ class Transaction(models.Model):
 
 
 # Keep Expense for backward-compat (used by existing views), but now link to Account.
+# keep transaction except loan and repayment
 class Expense(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="expenses")
     category = models.ForeignKey(

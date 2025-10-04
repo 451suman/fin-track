@@ -88,7 +88,6 @@ from django.utils.dateparse import parse_date  # ⬅ add at top with other impor
 
 class ExpenseListView(LoginRequiredMixin, ListView):
     model = Expense
-    paginate_by = 10
     template_name = "tracker/expense_list.html"
     paginate_by = 100
     def get_queryset(self):
@@ -120,7 +119,6 @@ class ExpenseListView(LoginRequiredMixin, ListView):
             d = parse_date(end)
             if d:
                 qs = qs.filter(date__lte=d)
-
         return qs
 
     def get_context_data(self, **kwargs):
