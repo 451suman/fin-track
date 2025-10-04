@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Loan with {{ loan.person.name }}</h3>
+  <a href="{% url 'loan_list' %}" class="btn btn-outline-light">Back</a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card soft shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Summary</h5>
+        <ul class="mb-0">
+          <li>Direction: <strong>{{ loan.get_direction_display }}</strong></li>
+          <li>Principal: <strong>Rs. {{ loan.principal|floatformat:2 }}</strong></li>
+          <li>Outstanding: <strong>Rs. {{ loan.outstanding|floatformat:2 }}</strong></li>
+          <li>Account: {{ loan.account.name }}</li>
+          <li>Date: {{ loan.date }}</li>
+          <li>Due: {% if loan.due_date %}{{ loan.due_date }}{% else %}<span class="text-secondary">—</span>{% endif %}</li>
+          <li>Status: {{ loan.get_status_display }}</li>
+          {% if loan.interest_rate and loan.interest_rate|floatformat:2 != '0.00' %}
+            <li>Interest: {{ loan.interest_rate|floatformat:2 }}% p.a.</li>
+          {% endif %}
+          {% if loan.description %}<li>Note: {{ loan.description }}</li>{% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card soft shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Add Repayment</h5>
+        <form method="post" action="{% url 'loan_repay' loan.pk %}">{% csrf_token %}
+          {{ form.as_p }}
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary">Add</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card soft shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Repayments</h5>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Date</th><th>Account</th><th class="text-end">Amount</th><th>Note</th></tr></thead>
+            <tbody>
+              {% for r in repayments %}
+                <tr>
+                  <td>{{ r.date }}</td>
+                  <td>{{ r.account.name }}</td>
+                  <td class="text-end">Rs. {{ r.amount|floatformat:2 }}</td>
+                  <td>{{ r.note }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="text-center text-secondary py-4">No repayments yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

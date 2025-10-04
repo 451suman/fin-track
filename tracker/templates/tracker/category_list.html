@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Categories</h3>
+  <a href="{% url 'category_create' %}" class="btn btn-primary">Add Category</a>
+</div>
+<div class="row g-3">
+  {% for c in object_list %}
+  <div class="col-md-4">
+    <div class="card soft shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="badge" style="background: {{ c.color }}">{{ c.name }}</span>
+          <div class="btn-group">
+            <a class="btn btn-sm btn-outline-light" href="{% url 'category_update' c.pk %}">Edit</a>
+            <a class="btn btn-sm btn-outline-danger" href="{% url 'category_delete' c.pk %}">Delete</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+    <div class="col-12"><div class="text-center text-secondary">No categories</div></div>
+  {% endfor %}
+</div>
+{% endblock %}

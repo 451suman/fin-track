@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card soft shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Total Spent</h5>
+        <div class="display-6 fw-bold">Rs. {{ total|floatformat:2 }}</div>
+        <p class="text-secondary mb-0">Across all categories</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card p-3 soft shadow-sm">
+      <canvas id="pie"></canvas>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card soft shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Recent</h5>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Date</th><th>Category</th><th>Amount</th><th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for x in recent %}
+              <tr>
+                <td>{{ x.date }}</td>
+                <td><span class="badge" style="background: {{ x.category.color }}">{{ x.category.name }}</span></td>
+                <td class="fw-semibold">Rs. {{ x.amount|floatformat:2 }}</td>
+                <td>{{ x.description }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="4" class="text-center text-secondary py-4">No expenses yet.</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const ctx = document.getElementById('pie');
+  const data = {
+    labels: {{ labels|safe }},
+    datasets: [{
+      data: {{ data|safe }},
+      backgroundColor: {{ colors|safe }},
+    }]
+  };
+  new Chart(ctx, {type: 'doughnut', data});
+</script>
+{% endblock %}
+
+
+<div class="col-12 mt-4">
+  <div class="card soft shadow-sm">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Accounts</h5>
+        <div class="btn-group">
+          <a href="{% url 'account_create' %}" class="btn btn-sm btn-primary">Add Account</a>
+          <a href="{% url 'transfer' %}" class="btn btn-sm btn-outline-light">Transfer</a>
+          <a href="{% url 'income_add' %}" class="btn btn-sm btn-outline-light">Add Income</a>
+        </div>
+      </div>
+      <div class="table-responsive mt-3">
+        <table class="table table-hover align-middle">
+          <thead><tr><th>Account</th><th>Type</th><th class="text-end">Balance (NPR)</th><th></th></tr></thead>
+          <tbody>
+          {% for a in accounts %}
+            <tr>
+              <td>{{ a.name }}</td>
+              <td>{{ a.get_type_display }}</td>
+              <td class="text-end fw-semibold">Rs. {{ a.balance|floatformat:2 }}</td>
+              <td class="text-end"><a class="btn btn-sm btn-outline-light" href="{% url 'account_update' a.pk %}">Edit</a></td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="text-center text-secondary py-4">No accounts yet.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

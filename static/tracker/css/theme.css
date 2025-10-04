@@ -1,0 +1,17 @@
+:root {
+  --brand-1: #00bcd4; /* cyan */
+  --brand-2: #7c4dff; /* violet */
+  --brand-3: #00e5ff; /* accent */
+}
+body { background: radial-gradient(1200px 500px at 10% -10%, rgba(124,77,255,.15), transparent),
+               radial-gradient(900px 400px at 110% 10%, rgba(0,229,255,.12), transparent),
+               #0f1320; }
+.glassy { background: rgba(255,255,255,.05); backdrop-filter: blur(10px);}
+.soft { background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03)); border: 1px solid rgba(255,255,255,.08); }
+.navbar-brand { color: var(--brand-3); }
+.btn-primary { background: linear-gradient(45deg, var(--brand-1), var(--brand-2)); border: none; }
+.btn-outline-danger { border-color: #ff6b6b; color: #ff8787;}
+.btn-outline-danger:hover { background: #ff6b6b; color: #fff; }
+.badge { border-radius: 999px; }
+.card-title { color: #e6f7ff; }
+.table thead th { color: #9cc3ff; }

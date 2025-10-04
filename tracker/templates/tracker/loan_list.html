@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Loans</h3>
+  <a href="{% url 'loan_create' %}" class="btn btn-primary">New Loan</a>
+</div>
+
+<form class="row g-2 mb-3">
+  <div class="col-md-4">
+    <select name="direction" class="form-select">
+      <option value="">All directions</option>
+      <option value="LEND" {% if request.GET.direction == 'LEND' %}selected{% endif %}>I lent</option>
+      <option value="BORROW" {% if request.GET.direction == 'BORROW' %}selected{% endif %}>I borrowed</option>
+    </select>
+  </div>
+  <div class="col-md-4">
+    <select name="status" class="form-select">
+      <option value="">All statuses</option>
+      <option value="OPEN" {% if request.GET.status == 'OPEN' %}selected{% endif %}>Open</option>
+      <option value="CLOSED" {% if request.GET.status == 'CLOSED' %}selected{% endif %}>Closed</option>
+    </select>
+  </div>
+  <div class="col-md-4 d-grid">
+    <button class="btn btn-outline-light">Filter</button>
+  </div>
+</form>
+
+<div class="card soft shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr>
+        <th>Date</th>
+        <th>Person</th>
+        <th>Direction</th>
+        <th>Principal</th>
+        <th>Outstanding</th>
+        <th>Account</th>
+        <th>Status</th>
+        <th>Due</th>
+        <th>Nepali Date Due</th>
+        <th class="text-end">Actions</th>
+      </tr></thead>
+      <tbody>
+        {% for l in object_list %}
+          <tr>
+            <td>{{ l.date }}</td>
+            <td>{{ l.person.name }}</td>
+            <td>{{ l.get_direction_display }}</td>
+            <td>Rs. {{ l.principal|floatformat:2 }}</td>
+            <td>Rs. {{ l.outstanding|floatformat:2 }}</td>
+            <td>{{ l.account.name }}</td>
+            <td class="fw-semibold text-uppercase {% if l.status == 'CLOSED' %}text-success{% elif l.status == 'OPEN' %}text-danger{% endif %}">{{ l.status }}</td>
+            <td>{% if l.due_date %}{{ l.due_date }}{% else %}<span class="text-secondary">—</span>{% endif %}</td>
+            <td>{% if l.nepali_due_date %}{{ l.nepali_due_date }}{% else %}<span class="text-secondary">—</span>{% endif %}</td>
+          
+          
+          
+            <td class="text-end">
+              <a class="btn btn-sm btn-outline-light" href="{% url 'loan_detail' l.pk %}">Open</a>
+              <a class="btn btn-sm btn-outline-light" href="{% url 'loan_update' l.pk %}">Edit</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="8" class="text-center text-secondary py-4">No loans yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

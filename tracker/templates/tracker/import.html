@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card soft shadow-sm">
+      <div class="card-body">
+        <h4 class="mb-3">Import from Excel</h4>
+        <p class="text-secondary">Upload a file with columns <code>Category</code> and <code>Amount (NPR)</code>.</p>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input class="form-control" type="file" name="file" accept=".xlsx,.xls" required>
+          <button class="btn btn-primary mt-3">Import</button>
+          <a href="{% url 'export_csv' %}" class="btn btn-outline-light mt-3">Export CSV</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
