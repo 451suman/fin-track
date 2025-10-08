@@ -56,13 +56,22 @@ def update_transaction_amount(sender, instance, created, **kwargs):
                 txn_obj.save()
             except Transaction.DoesNotExist:
                 # Either skip or create the missing transaction
-                Transaction.objects.create(
-                    user=instance.user,
-                    account=instance.account,
-                    kind=Transaction.KIND_EXPENSE,
-                    category=instance.category,
-                    amount=instance.amount,
-                    date=instance.date,
-                    description=instance.description or f"Expense: {instance.category}",
-                    txn_uuid=instance.txn_uuid
+                find_txn = Transaction.objects.get(
+                    user = instance.user,
+                    account = instance.account,
+                    kind = Transaction.KIND_EXPENSE,
+                    category = instance.category,
+                    description = instance.description 
                 )
+                find_txn.txn_uuid = instance.txn_uuid
+                find_txn.save()
+                # Transaction.objects.create(
+                #     user=instance.user,
+                #     account=instance.account,
+                #     kind=Transaction.KIND_EXPENSE,
+                #     category=instance.category,
+                #     amount=instance.amount,
+                #     date=instance.date,
+                #     description=instance.description or f"Expense: {instance.category}",
+                #     txn_uuid=instance.txn_uuid
+                # )
