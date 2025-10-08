@@ -143,20 +143,21 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
         
         # also create a Transaction (expense) affecting the chosen account
         try:
-            with transaction.atomic(): 
-                expense = form.save()
-                if expense.account:
-                    Transaction.objects.create(
-                        user=self.request.user,
-                        account=expense.account,
-                        kind=Transaction.KIND_EXPENSE,
-                        category=expense.category,
-                        amount=expense.amount,
-                        date=expense.date,
-                        description=expense.description or f"Expense: {expense.category}",
-                    )
-                messages.success(self.request, "Expense added.")
-                return redirect(self.success_url)
+            # with transaction.atomic(): 
+            expense = form.save()
+                # if expense.account:
+                #     Transaction.objects.create(
+                #         user=self.request.user,
+                #         account=expense.account,
+                #         kind=Transaction.KIND_EXPENSE,
+                #         category=expense.category,
+                #         amount=expense.amount,
+                #         date=expense.date,
+                #         description=expense.description or f"Expense: {expense.category}",
+                #         txn_uuid=expense.txn_uuid
+                    # )
+            messages.success(self.request, "Expense added.")
+            return redirect(self.success_url)
         except Exception as e:
             messages.error(self.request, f"Error adding expense: {str(e)}")
             return redirect(self.success_url)

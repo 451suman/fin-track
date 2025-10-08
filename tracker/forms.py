@@ -93,7 +93,7 @@ class PersonForm(forms.ModelForm):
 class LoanForm(forms.ModelForm):
     class Meta:
         model = Loan
-        fields = ['person', 'direction', 'principal', 'date', 'due_date', 'interest_rate', 'account', 'description', 'status']
+        fields = ['person', 'direction', 'principal', 'interest_rate', 'account','date', 'due_date', 'description', 'status']
         widgets = {
             'person': forms.Select(attrs={'class': 'form-select'}),
             'direction': forms.Select(attrs={'class': 'form-select'}),
@@ -101,10 +101,16 @@ class LoanForm(forms.ModelForm):
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'due_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'interest_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            # 'interest_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'disabled': True}),
             'account': forms.Select(attrs={'class': 'form-select'}),
             'description': forms.TextInput(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
+            
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.is_bound:  # only set when the form is first shown
+            self.fields['interest_rate'].initial = 0
     def clean(self):
         cleaned_data = super().clean()
         direction = cleaned_data.get('direction')

@@ -1,5 +1,6 @@
 from datetime import date
 import datetime
+import uuid
 import nepali_datetime
 from django.db import models
 from django.contrib.auth.models import User
@@ -8,6 +9,8 @@ from django.db.models import Sum, F, Q
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+
+from tracker.common import generate_transactions_ref
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     color = models.CharField(
@@ -78,12 +81,16 @@ class Transaction(models.Model):
     date = models.DateField(default=timezone.now)
     description = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    txn_uuid =models.CharField(
+        max_length=100, unique=True, editable=False, blank=True, null=True , 
+    )
 
     class Meta:
         ordering = ["-date", "-id"]
 
     def __str__(self):
         return f"{self.kind} {self.amount} on {self.account}"
+
 
 
 # Keep Expense for backward-compat (used by existing views), but now link to Account.
@@ -104,12 +111,22 @@ class Expense(models.Model):
     )
     description = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    txn_uuid =models.CharField(
+        max_length=100, unique=True, editable=False, blank=True, null=True
+    )
+    
 
     class Meta:
         ordering = ["-date", "-id"]
 
     def __str__(self):
         return f"{self.category} - {self.amount}"
+    def save(self, *args, **kwargs):
+        if not self.txn_uuid:
+            self.txn_uuid = generate_transactions_ref("TXN")
+        super().save(*args, **kwargs)
+    
+
     
     @property
     def nepali_date(self):

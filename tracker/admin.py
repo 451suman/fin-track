@@ -14,15 +14,16 @@ class AccountAdmin(admin.ModelAdmin):
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('date', 'kind', 'account', 'amount', 'category', 'user', 'description')
+    list_display = ('date',"txn_uuid", 'kind', 'account', 'amount', 'category', 'user', 'description')
     list_filter = ('kind', 'account', 'category', 'date')
-    search_fields = ('description',)
+    search_fields = ('description',"txn_uuid",)
+    
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
-    list_display = ('date', 'category', 'amount', 'account', 'user', 'description')
+    list_display = ('date',"txn_uuid", 'category', 'amount', 'account', 'user', 'description')
     list_filter = ('category', 'date', 'user')
-    search_fields = ('description',)
+    search_fields = ('description',"txn_uuid",)
 
 
 
