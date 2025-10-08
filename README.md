@@ -30,3 +30,7 @@ Visit http://127.0.0.1:8000 and register/login.
 - Default DB: SQLite (`db.sqlite3`)
 - Change `DEBUG`, `ALLOWED_HOSTS`, and `SECRET_KEY` before production.
 # expense-tracker
+
+
+
+<!-- cp -r /home/Suman967696/pull/fin-track/* /home/Suman967696/fin-track/ -->
