@@ -86,7 +86,7 @@ class Transaction(models.Model):
     )
 
     class Meta:
-        ordering = ["-date", "-id"]
+        ordering = ["-id"]
 
     def __str__(self):
         return f"{self.kind} {self.amount} on {self.account}"
@@ -117,7 +117,7 @@ class Expense(models.Model):
     
 
     class Meta:
-        ordering = ["-date", "-id"]
+        ordering = ["-id"]
 
     def __str__(self):
         return f"{self.category} - {self.amount}"
