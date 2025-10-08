@@ -136,10 +136,10 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        account =form.instance.account
-        if account.balance < form.instance.amount:
-            messages.error(self.request, f"Insufficient funds in Account: {account.name}")
-            return redirect(self.success_url)
+        # account =form.instance.account
+        # if account.balance < form.instance.amount:
+        #     messages.error(self.request, f"Insufficient funds in Account: {account.name}")
+        #     return redirect(self.success_url)
         
         # also create a Transaction (expense) affecting the chosen account
         try:
@@ -448,6 +448,11 @@ class LoanCreateView(LoginRequiredMixin, CreateView):
 
     @dbtx.atomic
     def form_valid(self, form):
+        # if form.instance.direction == Loan.DIR_LEND and form.instance.account.balance < form.instance.principal:
+        #     messages.error(self.request, f"Insufficient funds in Account: {form.instance.account.name}")
+        #     return redirect(self.success_url)
+        
+        # Ledger impact at creation:
         form.instance.user = self.request.user
         loan = form.save()
 

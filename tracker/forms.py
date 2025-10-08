@@ -1,3 +1,4 @@
+from datetime import timezone
 from django import forms
 from .models import Expense, Category, Account, Transaction
 
@@ -12,7 +13,23 @@ class ExpenseForm(forms.ModelForm):
             'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Optional note'}),
         }
-    
+    def clean(self):
+        cleaned_data = super().clean()
+        account = cleaned_data.get('account')
+        amount = cleaned_data.get('amount')
+        date = cleaned_data.get('date')
+        if account.balance < amount:
+            raise forms.ValidationError({
+                'account': f"❌ Insufficient funds in Account: {account.name} (Balance: {account.balance})"
+            })
+        if amount <= 0:
+            raise forms.ValidationError({
+                'amount': f"❌ Amount must be greater than 0."
+            })
+
+        return cleaned_data
+
+
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
@@ -93,7 +110,17 @@ class LoanForm(forms.ModelForm):
             'description': forms.TextInput(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
         }
-
+    def clean(self):
+        cleaned_data = super().clean()
+        direction = cleaned_data.get('direction')
+        principal = cleaned_data.get('principal')
+        account = cleaned_data.get('account')
+        if direction == Loan.DIR_LEND and account and principal:
+            if account.balance < principal:
+                raise forms.ValidationError({
+                    'account': f"❌ Insufficient funds in Account: {account.name} (Balance: {account.balance})"
+                })
+        return cleaned_data
 class LoanRepaymentForm(forms.ModelForm):
     class Meta:
         model = LoanRepayment
