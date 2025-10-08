@@ -12,7 +12,7 @@ class ExpenseForm(forms.ModelForm):
             'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Optional note'}),
         }
-
+    
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category

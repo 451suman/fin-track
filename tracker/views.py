@@ -15,7 +15,7 @@ import pandas as pd
 from .models import Expense, Category, Account, Transaction
 from .forms import ExpenseForm, CategoryForm, AccountForm, IncomeForm, TransferForm
 from django.db.utils import OperationalError, ProgrammingError
-
+from django.db import transaction
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -136,20 +136,31 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        messages.success(self.request, "Expense added.")
+        account =form.instance.account
+        if account.balance < form.instance.amount:
+            messages.error(self.request, f"Insufficient funds in Account: {account.name}")
+            return redirect(self.success_url)
+        
         # also create a Transaction (expense) affecting the chosen account
-        obj = form.save()
-        if obj.account:
-            Transaction.objects.create(
-                user=self.request.user,
-                account=obj.account,
-                kind=Transaction.KIND_EXPENSE,
-                category=obj.category,
-                amount=obj.amount,
-                date=obj.date,
-                description=obj.description or f"Expense: {obj.category}",
-            )
-        return redirect(self.success_url)
+        try:
+            with transaction.atomic(): 
+                expense = form.save()
+                if expense.account:
+                    Transaction.objects.create(
+                        user=self.request.user,
+                        account=expense.account,
+                        kind=Transaction.KIND_EXPENSE,
+                        category=expense.category,
+                        amount=expense.amount,
+                        date=expense.date,
+                        description=expense.description or f"Expense: {expense.category}",
+                    )
+                messages.success(self.request, "Expense added.")
+                return redirect(self.success_url)
+        except Exception as e:
+            messages.error(self.request, f"Error adding expense: {str(e)}")
+            return redirect(self.success_url)
+
 
 
 class ExpenseUpdateView(LoginRequiredMixin, UpdateView):
@@ -274,7 +285,7 @@ def transfer_view(request):
         desc = form.cleaned_data["description"]
         check_balance = Account.objects.get(user = request.user, type = from_account.type, name = from_account.name)
         if check_balance.balance < amt:
-            messages.error(request, f"Insufficient funds in {from_account.name}")
+            messages.error(request, f"Insufficient funds in Account: {from_account.name}")
             return redirect("account_list")
 
         # record as expense from src and income to dst
