@@ -82,7 +82,7 @@ class Transaction(models.Model):
     description = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     txn_uuid =models.CharField(
-        max_length=100,   blank=True, null=True , 
+        max_length=100,   blank=True, null=True , editable=False
     )
 
     class Meta:
@@ -112,7 +112,7 @@ class Expense(models.Model):
     description = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     txn_uuid =models.CharField(
-        max_length=100,  blank=True, null=True
+        max_length=100,  blank=True, null=True, editable=False
     )
     
 

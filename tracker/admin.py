@@ -17,6 +17,8 @@ class TransactionAdmin(admin.ModelAdmin):
     list_display = ("id",'date',"txn_uuid", 'kind', 'account', 'amount', 'category', 'user', 'description')
     list_filter = ('kind', 'account', 'category', 'date')
     search_fields = ('description',"txn_uuid",)
+    readonly_fields = ('txn_uuid',)
+
     
 
 @admin.register(Expense)
@@ -24,6 +26,9 @@ class ExpenseAdmin(admin.ModelAdmin):
     list_display = ("id",'date',"txn_uuid", 'category', 'amount', 'account', 'user', 'description')
     list_filter = ('category', 'date', 'user')
     search_fields = ('description',"txn_uuid",)
+    # Make txn_uuid read-only in the form
+    readonly_fields = ('txn_uuid',)
+
 
 
 
