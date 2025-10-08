@@ -75,11 +75,6 @@ class TransferForm(forms.Form):
             self.fields['from_account'].queryset = Account.objects.filter(user=user)
             self.fields['to_account'].queryset = Account.objects.filter(user=user)
 
-    def clean(self):
-        cleaned = super().clean()
-        if cleaned.get('from_account') == cleaned.get('to_account'):
-            raise forms.ValidationError("Choose two different accounts for a transfer.")
-        return cleaned
 
 
 from django import forms

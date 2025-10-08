@@ -283,9 +283,12 @@ def transfer_view(request):
         to_account = form.cleaned_data["to_account"]
         amt = form.cleaned_data["amount"]
         desc = form.cleaned_data["description"]
-        check_balance = Account.objects.get(user = request.user, type = from_account.type, name = from_account.name)
-        if check_balance.balance < amt:
-            messages.error(request, f"Insufficient funds in Account: {from_account.name}")
+        
+        if from_account == to_account:
+            messages.error(request, "Source and destination accounts cannot be the same.")
+            return redirect("account_list")
+        if from_account.balance < amt:
+            messages.error(request, f"Insufficient funds in Account: {from_account.name} (Balance: {from_account.balance}) to transfer.")
             return redirect("account_list")
 
         # record as expense from src and income to dst
