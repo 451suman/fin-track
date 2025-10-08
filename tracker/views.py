@@ -268,24 +268,29 @@ def add_income_view(request):
 def transfer_view(request):
     form = TransferForm(request.POST or None, user=request.user)
     if request.method == "POST" and form.is_valid():
-        src = form.cleaned_data["from_account"]
-        dst = form.cleaned_data["to_account"]
+        from_account = form.cleaned_data["from_account"]
+        to_account = form.cleaned_data["to_account"]
         amt = form.cleaned_data["amount"]
         desc = form.cleaned_data["description"]
+        check_balance = Account.objects.get(user = request.user, type = from_account.type, name = from_account.name)
+        if check_balance.balance < amt:
+            messages.error(request, f"Insufficient funds in {from_account.name}")
+            return redirect("account_list")
+
         # record as expense from src and income to dst
         Transaction.objects.create(
             user=request.user,
-            account=src,
+            account=from_account,
             kind=Transaction.KIND_EXPENSE,
             amount=amt,
-            description=desc or f"Transfer to {dst.name}",
+            description=desc or f"Transfer to {to_account.name}",
         )
         Transaction.objects.create(
             user=request.user,
-            account=dst,
+            account=to_account,
             kind=Transaction.KIND_INCOME,
             amount=amt,
-            description=desc or f"Transfer from {src.name}",
+            description=desc or f"Transfer from {from_account.name}",
         )
         messages.success(request, "Transfer completed.")
         return redirect("account_list")

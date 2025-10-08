@@ -3,14 +3,14 @@ from pathlib import Path
 from dotenv import load_dotenv
 import platform
 import platform
-
+from django.contrib.messages import constants as messages
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG', True)
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -81,6 +81,11 @@ LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
 
-CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://127.0.0.1:8000").split(",")
-print("ALLOWED_HOSTS =", ALLOWED_HOSTS)
-print("CSRF_TRUSTED_ORIGINS =", CSRF_TRUSTED_ORIGINS)
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS").split(",")
+MESSAGE_TAGS = {
+    messages.DEBUG: "secondary",
+    messages.INFO: "info",
+    messages.WARNING: "warning",
+    messages.ERROR: "danger",
+    messages.SUCCESS: "success",
+}
