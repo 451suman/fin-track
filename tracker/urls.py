@@ -2,6 +2,11 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # auth
+    path("auth/login/", views.login_view, name="login"),
+    path("auth/logout/", views.logout_view, name="logout"),
+    # path("auth/register/", views.register_view, name="register"),
+    # dash board
     path("dashboard/", views.dashboard, name="dashboard"),
     path("expenses/", views.ExpenseListView.as_view(), name="expense_list"),
     path("expenses/create/", views.ExpenseCreateView.as_view(), name="expense_create"),
@@ -45,9 +50,7 @@ urlpatterns = [
     path("transfer/", views.transfer_view, name="transfer"),
     path("import/", views.import_excel_view, name="import_excel"),
     path("export/csv/", views.export_csv_view, name="export_csv"),
-    path("auth/login/", views.login_view, name="login"),
-    path("auth/logout/", views.logout_view, name="logout"),
-    path("auth/register/", views.register_view, name="register"),
+
     # People
     path("people/", views.PersonListView.as_view(), name="person_list"),
     path("people/create/", views.PersonCreateView.as_view(), name="person_create"),
