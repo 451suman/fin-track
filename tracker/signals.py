@@ -20,10 +20,11 @@ def update_transaction_amount(sender, instance, created, **kwargs):
         txn = instance.txn_uuid
         if txn:
             txn_obj = Transaction.objects.get(txn_uuid=txn)
-            txn_obj.amount = instance.amount
+            txn_obj.account = instance.account
             txn_obj.category = instance.category
-            txn_obj.description = instance.description
+            txn_obj.amount = instance.amount
             txn_obj.date = instance.date
+            txn_obj.description = instance.description
             txn_obj.save()
         
 

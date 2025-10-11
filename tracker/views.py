@@ -13,7 +13,7 @@ from django.db import models
 import pandas as pd
 
 from .models import Expense, Category, Account, Transaction
-from .forms import ExpenseForm, CategoryForm, AccountForm, IncomeForm, TransferForm
+from .forms import AccountFormUpdate, ExpenseForm, CategoryForm, AccountForm, IncomeForm, TransferForm
 from django.db.utils import OperationalError, ProgrammingError
 from django.db import transaction
 
@@ -245,7 +245,7 @@ class AccountCreateView(LoginRequiredMixin, CreateView):
 
 class AccountUpdateView(LoginRequiredMixin, UpdateView):
     model = Account
-    form_class = AccountForm
+    form_class = AccountFormUpdate
     success_url = reverse_lazy("account_list")
     template_name = "tracker/account_form.html"
 
@@ -511,40 +511,112 @@ class LoanDetailView(LoginRequiredMixin, ListView):
         ctx = super().get_context_data(**kwargs)
         ctx["loan"] = self.loan
         ctx["form"] = LoanRepaymentForm()
+        ctx["lend_or_borow"] = str(self.loan.direction).capitalize()
         return ctx
 
+
+# @login_required
+# @dbtx.atomic
+# def add_repayment_view(request, pk):
+#     loan = get_object_or_404(Loan, pk=pk, user=request.user)
+#     form = LoanRepaymentForm(request.POST or None)
+#     if request.method == "POST" and form.is_valid():
+#         rep = form.save(commit=False)
+#         rep.loan = loan
+#         rep.save()
+#         acc =  rep.account
+#         # Ledger impact at repayment:
+#         if loan.direction == Loan.DIR_LEND:
+#             # I lent earlier, so repayment is INCOME to me
+#             Transaction.objects.create(
+#                 user=request.user,
+#                 account=rep.account,
+#                 kind=Transaction.KIND_INCOME,
+#                 amount=rep.amount,
+#                 description=f"Repayment from {loan.person.name}",
+#                 date=rep.date,
+#             )
+#         else:
+#             # I borrowed earlier, so repayment is EXPENSE for me
+#             if acc.balance < rep.amount:
+#                 messages.error(request, f"Insufficient funds in Account: {acc.name}")
+#                 return redirect("loan_detail", pk=loan.pk)
+
+#             # TODO: check if this is correct
+#             Transaction.objects.create(
+#                 user=request.user,
+#                 account=rep.account,
+#                 kind=Transaction.KIND_EXPENSE,
+#                 amount=rep.amount,
+#                 description=f"Repayment to {loan.person.name}",
+#                 date=rep.date,
+#             )
+
+#         # Auto-close if fully repaid
+#         if loan.outstanding <= 0 and loan.status != Loan.STATUS_CLOSED:
+#             loan.status = Loan.STATUS_CLOSED
+#             loan.save(update_fields=["status"])
+
+#         messages.success(request, "Repayment added.")
+#         return redirect("loan_detail", pk=loan.pk)
+#     return render(
+#         request,
+#         "tracker/loan_detail.html",
+#         {"loan": loan, "form": form, "repayments": loan.repayments.all()},
+#     )
+
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db import transaction as dbtx
+from django.shortcuts import get_object_or_404, render, redirect
 
 @login_required
 @dbtx.atomic
 def add_repayment_view(request, pk):
     loan = get_object_or_404(Loan, pk=pk, user=request.user)
     form = LoanRepaymentForm(request.POST or None)
+
     if request.method == "POST" and form.is_valid():
         rep = form.save(commit=False)
         rep.loan = loan
-        rep.save()
+        acc = rep.account  # <-- Account instance already on the unsaved form object
 
-        # Ledger impact at repayment:
-        if loan.direction == Loan.DIR_LEND:
-            # I lent earlier, so repayment is INCOME to me
-            Transaction.objects.create(
-                user=request.user,
-                account=rep.account,
-                kind=Transaction.KIND_INCOME,
-                amount=rep.amount,
-                description=f"Repayment from {loan.person.name}",
-                date=rep.date,
-            )
-        else:
-            # I borrowed earlier, so repayment is EXPENSE for me
-            Transaction.objects.create(
-                user=request.user,
-                account=rep.account,
-                kind=Transaction.KIND_EXPENSE,
-                amount=rep.amount,
-                description=f"Repayment to {loan.person.name}",
-                date=rep.date,
-            )
+        # If I borrowed earlier, paying back is an EXPENSE → ensure funds available
+        if loan.direction == Loan.DIR_BORROW:
+            if acc.balance < rep.amount:
+                # Don't save anything; show error on the same page
+                messages.error(request, f"Insufficient funds in account: {acc.name} (Balance: {acc.balance})")
+
+                form.add_error(None, f"❌ Insufficient funds in account: {acc.name} (Balance: {acc.balance})")
+                return render(
+                    request,
+                    "tracker/loan_detail.html",
+                    {"loan": loan, "form": form, "repayments": loan.repayments.all()},
+                    status=400,
+                )
+
+        # Create the ledger transaction first (so Account.balance reflects it)
+        kind = (
+            Transaction.KIND_INCOME
+            if loan.direction == Loan.DIR_LEND
+            else Transaction.KIND_EXPENSE
+        )
+        description = (
+            f"Repayment from {loan.person.name}"
+            if loan.direction == Loan.DIR_LEND
+            else f"Repayment to {loan.person.name}"
+        )
+        Transaction.objects.create(
+            user=request.user,
+            account=acc,            # instance is fine
+            kind=kind,
+            amount=rep.amount,
+            description=description,
+            date=rep.date,
+        )
+
+        # Now persist the repayment
+        rep.save()
 
         # Auto-close if fully repaid
         if loan.outstanding <= 0 and loan.status != Loan.STATUS_CLOSED:
@@ -553,6 +625,8 @@ def add_repayment_view(request, pk):
 
         messages.success(request, "Repayment added.")
         return redirect("loan_detail", pk=loan.pk)
+
+    # GET or invalid POST
     return render(
         request,
         "tracker/loan_detail.html",

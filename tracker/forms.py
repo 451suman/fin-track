@@ -48,6 +48,16 @@ class AccountForm(forms.ModelForm):
             'type': forms.Select(attrs={'class': 'form-select'}),
             'opening_balance': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
         }
+class AccountFormUpdate(forms.ModelForm):
+    class Meta:
+        model = Account
+        # fields = ['name', 'type', 'opening_balance']
+        fields = ['name', 'type']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'type': forms.Select(attrs={'class': 'form-select'}),
+            # 'opening_balance': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+        }
 
 class IncomeForm(forms.ModelForm):
     class Meta:
