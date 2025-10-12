@@ -89,7 +89,7 @@ from django.utils.dateparse import parse_date  # ⬅ add at top with other impor
 class ExpenseListView(LoginRequiredMixin, ListView):
     model = Expense
     template_name = "tracker/expense_list.html"
-    paginate_by = 100
+    paginate_by = 50
     def get_queryset(self):
         qs = Expense.objects.filter(user=self.request.user).select_related(
             "category", "account"
