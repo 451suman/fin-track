@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 from tracker.models import Expense, Transaction
@@ -26,6 +26,11 @@ def update_transaction_amount(sender, instance, created, **kwargs):
             txn_obj.date = instance.date
             txn_obj.description = instance.description
             txn_obj.save()
+        
+@receiver(post_delete, sender=Expense)
+def delete_transaction(sender, instance, **kwargs):
+    if instance.txn_uuid:
+        Transaction.objects.filter(txn_uuid=instance.txn_uuid).delete()
         
 
 

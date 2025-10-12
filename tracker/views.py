@@ -13,7 +13,7 @@ from django.db import models
 import pandas as pd
 
 from .models import Expense, Category, Account, Transaction
-from .forms import AccountFormUpdate, ExpenseForm, CategoryForm, AccountForm, IncomeForm, TransferForm
+from .forms import AccountFormUpdate, ExpenseForm, CategoryForm, AccountForm, ExpenseUpdateForm, IncomeForm, TransferForm
 from django.db.utils import OperationalError, ProgrammingError
 from django.db import transaction
 
@@ -166,7 +166,7 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
 
 class ExpenseUpdateView(LoginRequiredMixin, UpdateView):
     model = Expense
-    form_class = ExpenseForm
+    form_class = ExpenseUpdateForm
     success_url = reverse_lazy("expense_list")
     template_name = "tracker/expense_form.html"
 

@@ -18,7 +18,55 @@ class ExpenseForm(forms.ModelForm):
         account = cleaned_data.get('account')
         amount = cleaned_data.get('amount')
         date = cleaned_data.get('date')
+
         if account.balance < amount:
+            raise forms.ValidationError({
+                'account': f"❌ Insufficient funds in Account: {account.name} (Balance: {account.balance})"
+            })
+        if amount <= 0:
+            raise forms.ValidationError({
+                'amount': f"❌ Amount must be greater than 0."
+            })
+
+        return cleaned_data
+
+
+class ExpenseUpdateForm(forms.ModelForm):
+    previous_amount = forms.DecimalField(
+        label="Previous Amount",
+        required=False,
+        disabled=True,          # makes it read-only in the form
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'readonly': True
+        })
+    )
+
+    class Meta:
+        model = Expense
+        fields = ['date', 'account', 'category','previous_amount',  'amount', 'description']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'account': forms.Select(attrs={'class': 'form-select'}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Optional note'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set previous_amount if editing an existing expense
+        if self.instance and self.instance.pk:
+            self.fields['previous_amount'].initial = self.instance.amount
+    def clean(self):
+        cleaned_data = super().clean()
+        account = cleaned_data.get('account')
+        amount = cleaned_data.get('amount')
+        previous_amount = cleaned_data.get('previous_amount')
+        date = cleaned_data.get('date')
+        accual_amt = previous_amount + account.balance
+        breakpoint()
+        if accual_amt < amount:
             raise forms.ValidationError({
                 'account': f"❌ Insufficient funds in Account: {account.name} (Balance: {account.balance})"
             })
