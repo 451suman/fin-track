@@ -65,7 +65,6 @@ class ExpenseUpdateForm(forms.ModelForm):
         previous_amount = cleaned_data.get('previous_amount')
         date = cleaned_data.get('date')
         accual_amt = previous_amount + account.balance
-        breakpoint()
         if accual_amt < amount:
             raise forms.ValidationError({
                 'account': f"❌ Insufficient funds in Account: {account.name} (Balance: {account.balance})"
